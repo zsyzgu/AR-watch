@@ -10,8 +10,11 @@ public class InertialSensor implements SensorEventListener {
 
     Sensor sensorAccelerometer;
     Sensor sensorGyroscope;
-    /*Sensor sensorMegneticField;
-    Sensor sensorGravity;*/
+
+    //FPS
+    long lastSecond;
+    int cntAcc;
+    int cntGyr;
 
     public InertialSensor(MainActivity father) {
         this.father = father;
@@ -22,27 +25,40 @@ public class InertialSensor implements SensorEventListener {
         sensorGyroscope = father.sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         father.sensorManager.registerListener(this, sensorGyroscope, SensorManager.SENSOR_DELAY_FASTEST);
 
-        /*sensorMegneticField = father.sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        father.sensorManager.registerListener(this, sensorMegneticField, SensorManager.SENSOR_DELAY_FASTEST);
-
-        sensorGravity = father.sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
-        father.sensorManager.registerListener(this, sensorGravity, SensorManager.SENSOR_DELAY_FASTEST);*/
+        lastSecond = System.currentTimeMillis();
+        cntAcc = 0;
+        cntGyr = 0;
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        float timestamp = (System.currentTimeMillis() - father.startTime) / 1000.0f;
         if (event.sensor == sensorAccelerometer) {
-            father.uTextAccelerometer.setText(String.format("Acc: %.2f, %.2f, %.2f", event.values[0], event.values[1], event.values[2]));
+            synchronized (sensorAccelerometer) {
+                father.uTextAccelerometer.setText(String.format("Acc, %.2f, %.2f, %.2f", event.values[0], event.values[1], event.values[2]));
+                if (father.logger != null) {
+                    father.logger.write(String.format("Acc, %.3f, %.2f, %.2f, %.2f\n", timestamp, event.values[0], event.values[1], event.values[2]));
+                    father.logger.flush();
+                }
+                cntAcc++;
+            }
         }
         if (event.sensor == sensorGyroscope) {
-            father.uTextGyroscope.setText(String.format("Gyr: %.2f, %.2f, %.2f", event.values[0], event.values[1], event.values[2]));
+            synchronized (sensorGyroscope) {
+                father.uTextGyroscope.setText(String.format("Gyr, %.2f, %.2f, %.2f", event.values[0], event.values[1], event.values[2]));
+                if (father.logger != null) {
+                    father.logger.write(String.format("Gyr, %.3f, %.2f, %.2f, %.2f\n", timestamp, event.values[0], event.values[1], event.values[2]));
+                    father.logger.flush();
+                }
+                cntGyr++;
+            }
         }
-        /*if (event.sensor == sensorMegneticField) {
-            father.uTextMegneticField.setText(String.format("Meg: %.2f, %.2f, %.2f", event.values[0], event.values[1], event.values[2]));
+        if (System.currentTimeMillis() - lastSecond >= 1000) {
+            lastSecond = System.currentTimeMillis();
+            father.uTextLog.setText(String.format("Acc = %d fps; Gyr = %d fps", cntAcc, cntGyr));
+            cntAcc = 0;
+            cntGyr = 0;
         }
-        if (event.sensor == sensorGravity) {
-            father.uTextGravity.setText(String.format("Gra: %.2f, %.2f, %.2f", event.values[0], event.values[1], event.values[2]));
-        }*/
     }
 
     @Override
