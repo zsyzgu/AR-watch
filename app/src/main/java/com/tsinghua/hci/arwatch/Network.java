@@ -8,6 +8,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Network {
     MainActivity father;
@@ -16,20 +18,27 @@ public class Network {
     BufferedReader reader;
     PrintWriter writer;
     Thread threadReceive;
+    Thread threadSend;
+    Queue<String> sendList;
 
     public Network(MainActivity father) {
         this.father = father;
+        sendList = new LinkedList<String>();
+    }
+
+    public boolean isConnected() {
+        return socket != null;
     }
 
     public void connect(String ip) {
-        if (socket == null) {
+        if (!isConnected()) {
             new NetworkAsyncTask().execute(ip);
         }
     }
 
     public void disconnect() {
         try {
-            if (socket != null) {
+            if (isConnected()) {
                 socket.close();
             }
         } catch (Exception e) {
@@ -38,6 +47,13 @@ public class Network {
         reader = null;
         writer = null;
         socket = null;
+        sendList.clear();
+    }
+
+    public void send(String string) {
+        if (writer != null) {
+            sendList.offer(string);
+        }
     }
 
     class NetworkAsyncTask extends AsyncTask<String, Integer, String> {
@@ -75,16 +91,37 @@ public class Network {
                     }
                 });
                 threadReceive.start();
+                threadSend = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            while (writer != null) {
+                                while (sendList.isEmpty()) {
+                                    Thread.sleep(1);
+                                }
+                                Log.d("Debug", "" + sendList.size());
+                                String s = sendList.poll();
+                                writer.write(s);
+                                writer.flush();
+                            }
+                        } catch (Exception e) {
+                            Log.d("network", e.toString());
+                        }
+                    }
+                });
+                threadSend.start();
                 return socket.toString();
             } catch (Exception e) {
                 socket = null;
+                writer = null;
                 reader = null;
+                sendList.clear();
                 return e.toString();
             }
         }
 
         protected void onPostExecute(String string) {
-            //father.uTextNetwork.setText(string);
+
         }
     }
 }

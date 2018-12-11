@@ -30,27 +30,31 @@ public class InertialSensor implements SensorEventListener {
         cntGyr = 0;
     }
 
+    private void updateInfo(String string) {
+        if (father.logger != null) {
+            father.logger.write(string);
+            father.logger.flush();
+        }
+        if (father.network != null && father.network.isConnected()) {
+            father.network.send(string);
+        }
+    }
+
     @Override
     public void onSensorChanged(SensorEvent event) {
         float timestamp = (System.currentTimeMillis() - father.startTime) / 1000.0f;
         if (event.sensor == sensorAccelerometer) {
             synchronized (sensorAccelerometer) {
-                father.uTextAccelerometer.setText(String.format("Acc, %.2f, %.2f, %.2f", event.values[0], event.values[1], event.values[2]));
-                if (father.logger != null) {
-                    father.logger.write(String.format("Acc, %.3f, %.2f, %.2f, %.2f\n", timestamp, event.values[0], event.values[1], event.values[2]));
-                    father.logger.flush();
-                }
                 cntAcc++;
+                father.uTextAccelerometer.setText(String.format("Acc, %.2f, %.2f, %.2f", event.values[0], event.values[1], event.values[2]));
+                updateInfo(String.format("Acc, %.3f, %.2f, %.2f, %.2f\n", timestamp, event.values[0], event.values[1], event.values[2]));
             }
         }
         if (event.sensor == sensorGyroscope) {
             synchronized (sensorGyroscope) {
-                father.uTextGyroscope.setText(String.format("Gyr, %.2f, %.2f, %.2f", event.values[0], event.values[1], event.values[2]));
-                if (father.logger != null) {
-                    father.logger.write(String.format("Gyr, %.3f, %.2f, %.2f, %.2f\n", timestamp, event.values[0], event.values[1], event.values[2]));
-                    father.logger.flush();
-                }
                 cntGyr++;
+                father.uTextGyroscope.setText(String.format("Gyr, %.2f, %.2f, %.2f", event.values[0], event.values[1], event.values[2]));
+                updateInfo(String.format("Gyr, %.3f, %.2f, %.2f, %.2f\n", timestamp, event.values[0], event.values[1], event.values[2]));
             }
         }
         if (System.currentTimeMillis() - lastSecond >= 1000) {
