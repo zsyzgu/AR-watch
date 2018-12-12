@@ -100,8 +100,10 @@ public class Network {
                                     Thread.sleep(1);
                                 }
                                 Log.d("Debug", "" + sendList.size());
-                                String s = sendList.poll();
-                                writer.write(s);
+                                while (!sendList.isEmpty()) {
+                                    String s = sendList.poll();
+                                    writer.write(s);
+                                }
                                 writer.flush();
                             }
                         } catch (Exception e) {
