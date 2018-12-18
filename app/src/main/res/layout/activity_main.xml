@@ -27,19 +27,36 @@
                 android:id="@+id/text_log"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Log" />
+                android:text="Log"
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/text_accelerometer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Linear Accelerometer" />
+                android:text="Acc"
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/text_gyroscope"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Gyroscope" />
+                android:text="Gyr"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/text_gravity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Gra"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/text_microphone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mic"
+                android:textSize="10sp" />
 
             <LinearLayout
                 android:id="@+id/layout_horizontal"
@@ -50,18 +67,18 @@
                 <Button
                     android:id="@+id/button_log"
                     android:layout_width="wrap_content"
-                    android:layout_height="35dp"
+                    android:layout_height="30dp"
                     android:layout_weight="1"
                     android:text="Log : OFF"
-                    android:textSize="10sp" />
+                    android:textSize="8sp" />
 
                 <Button
                     android:id="@+id/button_network"
                     android:layout_width="wrap_content"
-                    android:layout_height="35dp"
+                    android:layout_height="30dp"
                     android:layout_weight="1"
                     android:text="Net : OFF"
-                    android:textSize="10sp" />
+                    android:textSize="8sp" />
             </LinearLayout>
 
             <EditText
@@ -70,8 +87,8 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="textPersonName"
-                android:text="192.168.1.168"
-                android:textSize="10sp" />
+                android:text="192.168.1.118"
+                android:textSize="8sp" />
 
         </LinearLayout>
 

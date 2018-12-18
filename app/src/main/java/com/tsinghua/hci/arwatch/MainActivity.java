@@ -1,6 +1,7 @@
 package com.tsinghua.hci.arwatch;
 
 import android.hardware.SensorManager;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
@@ -14,12 +15,16 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends WearableActivity {
     //ui
     TextView uTextLog;
     TextView uTextAccelerometer;
     TextView uTextGyroscope;
+    TextView uTextGravity;
+    TextView uTextMicphone;
     Button uButtonLog;
     Button uButtonNetwork;
     EditText uEditTextIP;
@@ -27,6 +32,9 @@ public class MainActivity extends WearableActivity {
     //sensor
     SensorManager sensorManager;
     InertialSensor inertialSensor;
+
+    //microphone
+    Microphone microphone;
 
     //log
     long startTime;
@@ -44,6 +52,7 @@ public class MainActivity extends WearableActivity {
 
         onCreateUI();
         onCreateSensor();
+        onCreateMicrophone();
         onCreateLog();
         onCreateNetwork();
 
@@ -55,6 +64,8 @@ public class MainActivity extends WearableActivity {
         uTextLog = findViewById(R.id.text_log);
         uTextAccelerometer = findViewById(R.id.text_accelerometer);
         uTextGyroscope = findViewById(R.id.text_gyroscope);
+        uTextGravity = findViewById(R.id.text_gravity);
+        uTextMicphone = findViewById(R.id.text_microphone);
         uButtonLog = findViewById(R.id.button_log);
         uButtonLog.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,6 +92,11 @@ public class MainActivity extends WearableActivity {
     void onCreateSensor() {
         sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         inertialSensor = new InertialSensor(this);
+    }
+
+    void onCreateMicrophone() {
+        microphone = new Microphone(this);
+        microphone.start();
     }
 
     void onCreateLog() {
@@ -120,6 +136,16 @@ public class MainActivity extends WearableActivity {
                     uButtonLog.setText("LOG : OFF");
                 }
             }
+        }
+    }
+
+    void updateInfo(String string) {
+        if (logger != null) {
+            logger.write(string);
+            logger.flush();
+        }
+        if (network != null && network.isConnected()) {
+            network.send(string);
         }
     }
 }

@@ -12,8 +12,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Network {
-    MainActivity father;
     public final static int PORT = 8398;
+
+    MainActivity father;
     Socket socket;
     BufferedReader reader;
     PrintWriter writer;
